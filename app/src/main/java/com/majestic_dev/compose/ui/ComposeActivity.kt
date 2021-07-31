@@ -53,6 +53,7 @@ class ComposeActivity : ComponentActivity() {
     @Composable
     fun MessageCard(msg: Message) {
         var isExpanded by remember { mutableStateOf(false) }
+        var isAvatarExpanded by remember { mutableStateOf(false) }
 
         val surfaceColor: Color by animateColorAsState(
             if (isExpanded) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
@@ -68,9 +69,11 @@ class ComposeActivity : ComponentActivity() {
                 painter = painterResource(id = R.drawable.ic_launcher_foreground),
                 contentDescription = "Author avatar",
                 modifier = Modifier
-                    .size(40.dp)
+                    .animateContentSize()
+                    .size(if (isAvatarExpanded) 120.dp else 40.dp)
                     .clip(CircleShape)
                     .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
+                    .clickable { isAvatarExpanded = !isAvatarExpanded }
             )
 
             Spacer(modifier = Modifier.width(8.dp))
