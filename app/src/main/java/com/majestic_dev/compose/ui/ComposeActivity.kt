@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,6 +54,10 @@ class ComposeActivity : ComponentActivity() {
     fun MessageCard(msg: Message) {
         var isExpanded by remember { mutableStateOf(false) }
 
+        val surfaceColor: Color by animateColorAsState(
+            if (isExpanded) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,9 +85,13 @@ class ComposeActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Surface(
-                    modifier = Modifier.clickable { isExpanded = !isExpanded },
+                    modifier = Modifier
+                        .animateContentSize()
+                        .padding(1.dp)
+                        .clickable { isExpanded = !isExpanded },
                     shape = MaterialTheme.shapes.medium,
-                    elevation = 1.dp
+                    elevation = 1.dp,
+                    color = surfaceColor
                 ) {
                     Text(
                         text = msg.body,
