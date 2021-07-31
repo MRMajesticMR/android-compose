@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -34,6 +36,16 @@ class ComposeActivity : ComponentActivity() {
                         body = "Here some text"
                     )
                 )
+            }
+        }
+
+    }
+
+    @Composable
+    fun Conversation(messages: List<Message>) {
+        LazyColumn {
+            items(messages) { message ->
+                MessageCard(msg = message)
             }
         }
 
@@ -74,6 +86,14 @@ class ComposeActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+    }
+
+    @Preview
+    @Composable
+    fun PreviewConversation() {
+        ComposeTheme {
+            Conversation(messages = SampleData.conversationSample)
         }
     }
 
