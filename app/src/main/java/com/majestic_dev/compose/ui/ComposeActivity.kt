@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,12 +31,7 @@ class ComposeActivity : ComponentActivity() {
 
         setContent {
             ComposeTheme {
-                MessageCard(
-                    msg = Message(
-                        author = "Anton",
-                        body = "Here some text"
-                    )
-                )
+                Conversation(messages = SampleData.conversationSample)
             }
         }
 
@@ -53,8 +49,11 @@ class ComposeActivity : ComponentActivity() {
 
     @Composable
     fun MessageCard(msg: Message) {
+        var isExpanded by remember { mutableStateOf(false) }
+
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(all = 9.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -78,11 +77,16 @@ class ComposeActivity : ComponentActivity() {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Surface(shape = MaterialTheme.shapes.medium, elevation = 1.dp) {
+                Surface(
+                    modifier = Modifier.clickable { isExpanded = !isExpanded },
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = 1.dp
+                ) {
                     Text(
                         text = msg.body,
                         style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(all = 4.dp)
+                        modifier = Modifier.padding(all = 4.dp),
+                        maxLines = if (isExpanded) Int.MAX_VALUE else 1
                     )
                 }
             }
