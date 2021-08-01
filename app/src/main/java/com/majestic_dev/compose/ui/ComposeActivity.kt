@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -33,13 +34,35 @@ class ComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            var count by remember { mutableStateOf(0) }
+
             App {
-                Conversation(messages = SampleData.conversationSample)
+                Column {
+                    MessageCard(msg = SampleData.conversationSample.first())
+                    Counter(
+                        count = count,
+                        countUpdate = { count = it }
+                    )
+                }
             }
         }
 
     }
 
+}
+
+@Composable
+fun Counter(count: Int, countUpdate: (Int) -> Unit) {
+
+
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 16.dp),
+        onClick = { countUpdate(count + 1) }
+    ) {
+        Text("I've been clicked $count times")
+    }
 }
 
 @Composable
