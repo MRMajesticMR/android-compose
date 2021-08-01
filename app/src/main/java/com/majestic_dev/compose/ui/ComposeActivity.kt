@@ -33,105 +33,117 @@ class ComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ComposeTheme {
+            App {
                 Conversation(messages = SampleData.conversationSample)
             }
         }
 
     }
 
-    @Composable
-    fun Conversation(messages: List<Message>) {
-        LazyColumn {
-            items(messages) { message ->
-                MessageCard(msg = message)
-            }
-        }
+}
 
+@Composable
+fun App(content: @Composable () -> Unit) {
+    ComposeTheme {
+        Surface(
+            color = MaterialTheme.colors.background
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun Conversation(messages: List<Message>) {
+    LazyColumn {
+        items(messages) { message ->
+            MessageCard(msg = message)
+        }
     }
 
-    @Composable
-    fun MessageCard(msg: Message) {
-        var isExpanded by remember { mutableStateOf(false) }
-        var isAvatarExpanded by remember { mutableStateOf(false) }
+}
 
-        val surfaceColor: Color by animateColorAsState(
-            if (isExpanded) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+@Composable
+fun MessageCard(msg: Message) {
+    var isExpanded by remember { mutableStateOf(false) }
+    var isAvatarExpanded by remember { mutableStateOf(false) }
+
+    val surfaceColor: Color by animateColorAsState(
+        if (isExpanded) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 9.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = "Author avatar",
+            modifier = Modifier
+                .animateContentSize()
+                .size(if (isAvatarExpanded) 120.dp else 40.dp)
+                .clip(CircleShape)
+                .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
+                .clickable { isAvatarExpanded = !isAvatarExpanded }
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(all = 9.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = "Author avatar",
-                modifier = Modifier
-                    .animateContentSize()
-                    .size(if (isAvatarExpanded) 120.dp else 40.dp)
-                    .clip(CircleShape)
-                    .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
-                    .clickable { isAvatarExpanded = !isAvatarExpanded }
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Column {
+            Text(
+                text = msg.author,
+                color = MaterialTheme.colors.secondaryVariant,
+                style = MaterialTheme.typography.subtitle2
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-            Column {
+            Surface(
+                modifier = Modifier
+                    .animateContentSize()
+                    .padding(1.dp)
+                    .clickable { isExpanded = !isExpanded },
+                shape = MaterialTheme.shapes.medium,
+                elevation = 1.dp,
+                color = surfaceColor
+            ) {
                 Text(
-                    text = msg.author,
-                    color = MaterialTheme.colors.secondaryVariant,
-                    style = MaterialTheme.typography.subtitle2
+                    text = msg.body,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.padding(all = 4.dp),
+                    maxLines = if (isExpanded) Int.MAX_VALUE else 1
                 )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Surface(
-                    modifier = Modifier
-                        .animateContentSize()
-                        .padding(1.dp)
-                        .clickable { isExpanded = !isExpanded },
-                    shape = MaterialTheme.shapes.medium,
-                    elevation = 1.dp,
-                    color = surfaceColor
-                ) {
-                    Text(
-                        text = msg.body,
-                        style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(all = 4.dp),
-                        maxLines = if (isExpanded) Int.MAX_VALUE else 1
-                    )
-                }
             }
         }
     }
+}
 
-    @Preview
-    @Composable
-    fun PreviewConversation() {
-        ComposeTheme {
-            Conversation(messages = SampleData.conversationSample)
-        }
+//    @Preview()
+@Composable
+fun PreviewConversation() {
+    ComposeTheme {
+        Conversation(messages = SampleData.conversationSample)
     }
+}
 
-    @Preview(
-        name = "Light Mode"
-    )
-    @Preview(
-        name = "Dark Mode",
-        showBackground = true,
-        uiMode = Configuration.UI_MODE_NIGHT_YES
-    )
-    @Composable
-    fun PreviewMessageCard() {
-        ComposeTheme {
-            MessageCard(
-                msg = Message(
-                    author = "Arkadii",
-                    body = "Let's say hello to Android Compose Stable Version"
-                )
+@Preview(
+    name = "Light Mode"
+)
+@Preview(
+    name = "Dark Mode",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun PreviewMessageCard() {
+    ComposeTheme {
+        MessageCard(
+            msg = Message(
+                author = "Arkadii",
+                body = "Let's say hello to Android Compose Stable Version"
             )
-        }
+        )
     }
 }
