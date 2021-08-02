@@ -11,7 +11,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -27,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.majestic_dev.compose.R
 import com.majestic_dev.compose.ui.theme.ComposeTheme
+import kotlinx.coroutines.launch
 
 class ComposeActivity : ComponentActivity() {
 
@@ -34,14 +37,37 @@ class ComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            var count by remember { mutableStateOf(0) }
-
             App {
+                // We save the scrolling position with this state
+                val scrollState = rememberLazyListState()
+                // We save the coroutine scope where our animated scroll will be executed
+                val coroutineScope = rememberCoroutineScope()
+
                 Column {
-                    MessageCard(msg = SampleData.conversationSample.first())
-                    Counter(
-                        count = count,
-                        countUpdate = { count = it }
+                    Row {
+                        Button(onClick = {
+                            coroutineScope.launch {
+                                // 0 is the first item index
+                                scrollState.animateScrollToItem(0)
+                            }
+                        }) {
+                            Text("Scroll to the top")
+                        }
+
+                        Button(onClick = {
+                            coroutineScope.launch {
+                                // listSize - 1 is the last index of the list
+                                scrollState.animateScrollToItem(SampleData.conversationSample.size - 1)
+                            }
+                        }) {
+                            Text("Scroll to the end")
+                        }
+                    }
+
+
+                    Conversation(
+                        messages = SampleData.conversationSample,
+                        state = scrollState
                     )
                 }
             }
@@ -77,8 +103,11 @@ fun App(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun Conversation(messages: List<Message>) {
-    LazyColumn {
+fun Conversation(
+    state: LazyListState,
+    messages: List<Message>
+) {
+    LazyColumn(state = state) {
         items(messages) { message ->
             MessageCard(msg = message)
         }
@@ -140,14 +169,6 @@ fun MessageCard(msg: Message) {
                 )
             }
         }
-    }
-}
-
-//    @Preview()
-@Composable
-fun PreviewConversation() {
-    ComposeTheme {
-        Conversation(messages = SampleData.conversationSample)
     }
 }
 
